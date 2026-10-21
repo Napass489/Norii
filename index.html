@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yai Nori - Customer Reviews & Feedback</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        cute: ['Mali', 'cursive', 'sans-serif'],
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        nori: {
+                            bg: '#FDF9FC',
+                            pinkLight: '#FCE7F3',
+                            pink: '#F472B6',
+                            pinkDark: '#DB2777',
+                            purpleLight: '#F3E8FF',
+                            purple: '#C084FC',
+                            purpleDark: '#7E22CE',
+                            text: '#4A354F',
+                            muted: '#8E7394'
+                        }
+                    },
+                    boxShadow: {
+                        'princess': '0 10px 30px -5px rgba(244, 114, 182, 0.18), 0 4px 12px -2px rgba(192, 132, 252, 0.12)',
+                        'pill': '0 6px 20px -3px rgba(192, 132, 252, 0.15)',
+                        'floating': '0 12px 25px -4px rgba(219, 39, 119, 0.28)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #FDF9FC;
+            background-image: 
+                radial-gradient(at 10% 10%, rgba(252, 231, 243, 0.7) 0px, transparent 50%),
+                radial-gradient(at 90% 20%, rgba(243, 232, 255, 0.7) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(252, 231, 243, 0.5) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #4A354F;
+            font-family: 'Prompt', sans-serif;
+            overflow-x: hidden;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-100%); }
+        }
+        .animate-marquee {
+            display: inline-block;
+            white-space: nowrap;
+            padding-left: 100%;
+            animation: marquee 22s linear infinite;
+        }
+        .marquee-container:hover .animate-marquee {
+            animation-play-state: paused;
+        }
+        .marquee-fade-mask {
+            mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 6%, black 94%, transparent 100%);
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-6px) rotate(2deg); }
+        }
+        .btn-review-circle {
+            animation: floatSlow 4s ease-in-out infinite;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDF9FC;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #F5D0FE;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E879F9;
+        }
+
+        .princess-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 8px 25px -4px rgba(192, 132, 252, 0.16), inset 0 0 0 1px rgba(244, 114, 182, 0.2);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .princess-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 14px 30px -4px rgba(244, 114, 182, 0.25), inset 0 0 0 1.5px rgba(244, 114, 182, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-pink-200 selection:text-purple-900">
+
+    <div class="w-full pt-3 pb-1 px-4 relative z-30">
+        <div class="max-w-2xl mx-auto flex items-center gap-2.5">
+            <div class="flex-1 bg-white/85 backdrop-blur-md border-2 border-pink-200/90 rounded-full p-1.5 shadow-pill flex items-center overflow-hidden marquee-container relative">
+                <div class="bg-gradient-to-r from-pink-400 to-purple-400 text-white text-[11px] font-cute font-bold px-3 py-1 rounded-full shadow-sm shrink-0 z-10 flex items-center gap-1">
+                    <i class="ph-fill ph-sparkle text-xs animate-spin" style="animation-duration: 6s;"></i>
+                    <span>ประกาศ</span>
+                </div>
+                <div class="w-full overflow-hidden marquee-fade-mask ml-1">
+                    <p id="display-marquee" class="animate-marquee font-cute text-xs sm:text-sm text-purple-900 font-medium tracking-wide py-0.5">
+                        🌸 ยินดีต้อนรับสู่ Yai Nori พื้นที่รวมรีวิวความประทับใจจากคุณลูกค้าที่น่ารักทุกท่าน ขอบคุณที่ซัพพอร์ตกันนะคะ 🎀✨
+                    </p>
+                </div>
+                <span class="text-pink-400 pr-2.5 pl-1 text-sm shrink-0 hidden sm:inline-flex items-center">🎀</span>
+            </div>
+
+            <button onclick="openAdminModal()" 
+                    title="จัดการหลังบ้าน (Admin)"
+                    aria-label="จัดการหลังบ้าน (Admin)"
+                    class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/90 hover:bg-pink-50 text-purple-700 hover:text-pink-600 border-2 border-pink-200/90 shadow-pill flex items-center justify-center shrink-0 transition-all hover:scale-105 active:scale-95 group cursor-pointer">
+                <i class="ph-fill ph-gear-six text-lg sm:text-xl group-hover:rotate-90 transition-transform duration-500"></i>
+            </button>
+        </div>
+    </div>
+
+    <main class="w-full max-w-2xl mx-auto px-4 sm:px-6 pt-5 pb-20 flex-grow relative">
+        <div class="pointer-events-none select-none fixed top-28 left-6 text-pink-300/50 text-3xl animate-pulse hidden md:block">✦</div>
+        <div class="pointer-events-none select-none fixed top-60 right-8 text-purple-300/60 text-4xl animate-pulse hidden md:block">❀</div>
+
+        <section class="relative w-full">
+            <div id="banner-wrapper" class="w-full h-44 sm:h-60 rounded-[2rem] overflow-hidden p-1.5 bg-gradient-to-tr from-pink-200 via-white to-purple-200 shadow-princess relative group">
+                <div class="w-full h-full rounded-[1.65rem] overflow-hidden relative bg-pink-50 flex items-center justify-center">
+                    <img id="display-banner" 
+                         src="https://i.postimg.cc/6QW0bm9v/mi-m-ch-x-37-20261018235415.png" 
+                         alt="Yai Nori Banner" 
+                         onerror="this.src='https://placehold.co/800x350/FCE7F3/9D174D?text=Yai+Nori+Demo+Banner'"
+                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-gradient-to-t from-purple-950/20 via-transparent to-transparent pointer-events-none"></div>
+                </div>
+            </div>
+
+            <div class="relative -mt-16 sm:-mt-20 flex flex-col items-center z-10">
+                <div class="w-28 h-28 sm:w-36 sm:h-36 rounded-full p-1.5 bg-gradient-to-b from-white via-pink-100 to-purple-200 shadow-princess relative">
+                    <div class="w-full h-full rounded-full overflow-hidden border-4 border-white bg-white relative">
+                        <img id="display-logo" 
+                             src="https://i.postimg.cc/6QW0bm9v/mi-m-ch-x-37-20261018235415.png" 
+                             alt="Yai Nori Logo" 
+                             onerror="this.src='https://placehold.co/300x300/F3E8FF/6B21A8?text=Yai+Nori'"
+                             class="w-full h-full object-cover">
+                    </div>
+                </div>
+            </div>
+
+            <div class="relative mt-2 sm:mt-3 min-h-[5.5rem] flex flex-col items-center justify-center">
+                <div class="sm:absolute sm:left-2 sm:-top-6 order-2 sm:order-1 mt-3 sm:mt-0 z-10 flex flex-col items-center">
+                    <button id="btn-write-review" onclick="openWriteReviewModal()" 
+                            class="btn-review-circle w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-pink-400 via-pink-500 to-purple-500 text-white p-1 shadow-floating hover:scale-105 active:scale-95 transition-all flex flex-col items-center justify-center border-4 border-white group cursor-pointer overflow-hidden shrink-0"
+                            aria-label="เขียนรีวิว">
+                        <div id="default-review-btn-content" class="w-full h-full rounded-full border border-white/40 flex flex-col items-center justify-center px-1">
+                            <i class="ph-fill ph-pencil-line text-lg sm:text-xl mb-0.5 group-hover:rotate-12 transition-transform"></i>
+                            <span class="font-cute font-bold text-xs sm:text-sm leading-tight drop-shadow-sm">ปุ่มรีวิว</span>
+                            <span class="text-[9px] text-pink-100 font-light">กดเขียนเลย!</span>
+                        </div>
+                        <img id="custom-review-btn-img" 
+                             src="" 
+                             alt="ปุ่มรีวิว" 
+                             onerror="handleCustomReviewBtnError()"
+                             style="image-rendering: -webkit-optimize-contrast;"
+                             class="hidden object-contain select-none pointer-events-none transition-transform duration-300 group-hover:scale-110" />
+                    </button>
+                    <span id="custom-review-caption" class="text-[11px] font-cute font-semibold text-purple-800 bg-white/80 px-2 py-0.5 rounded-full border border-pink-200 mt-1 shadow-sm">
+                        ✏️ ปุ่มรีวิว กดเขียนเลย!
+                    </span>
+                </div>
+
+                <div class="text-center order-1 sm:order-2 px-4 max-w-md">
+                    <h1 id="display-shop-name" class="font-cute font-bold text-2xl sm:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-pink-600 via-purple-600 to-pink-500 drop-shadow-sm">
+                        Yai Nori
+                    </h1>
+                    <p id="display-shop-bio" class="text-xs sm:text-sm text-nori-muted mt-1 font-normal">
+                        รวมรีวิวสินค้าและบริการสุดคิ้วท์ ขอบคุณทุกความไว้วางใจค่ะ 🌷
+                    </p>
+                    
+                    <div class="mt-2.5 inline-flex flex-wrap items-center justify-center gap-2">
+                        <div class="bg-white/90 border border-pink-200/80 px-3 py-1 rounded-full text-xs font-medium text-purple-900 shadow-sm flex items-center gap-1.5">
+                            <i class="ph-fill ph-star text-amber-400 text-sm"></i>
+                            <span id="stat-avg-rating" class="font-bold">5.0</span>
+                            <span class="text-nori-muted">(<span id="stat-total-reviews">0</span> รีวิว)</span>
+                        </div>
+
+                        <div id="display-contacts" class="inline-flex items-center gap-1.5"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="mt-6 mb-4 flex items-center justify-between px-2 border-b border-pink-200/50 pb-2">
+            <div class="flex items-center gap-1.5 text-xs sm:text-sm font-cute font-semibold text-purple-800">
+                <i class="ph-fill ph-chat-circle-heart text-pink-500 text-base"></i>
+                <span>รีวิวจากลูกค้าที่น่ารัก (คลิกที่การ์ดเพื่ออ่านเต็มๆ)</span>
+            </div>
+            <select id="filter-star" onchange="renderReviews()" class="bg-white/90 border border-pink-200 text-purple-800 text-xs rounded-full px-3 py-1 outline-none focus:ring-2 focus:ring-pink-300 font-sans cursor-pointer">
+                <option value="all">ทั้งหมด (ทุกดาว)</option>
+                <option value="5">⭐⭐⭐⭐⭐ (5 ดาว)</option>
+                <option value="4">⭐⭐⭐⭐ (4 ดาว)</option>
+                <option value="3">⭐⭐⭐ (1-3 ดาว)</option>
+            </select>
+        </div>
+
+        <section id="reviews-zigzag-container" class="space-y-4 sm:space-y-3 py-2 flex flex-col"></section>
+
+        <div id="empty-reviews-state" class="hidden text-center py-12 princess-card rounded-3xl my-4">
+            <div class="w-14 h-14 rounded-full bg-pink-100 text-pink-500 flex items-center justify-center mx-auto mb-3 text-2xl">
+                <i class="ph-fill ph-sparkle"></i>
+            </div>
+            <p class="font-cute font-bold text-purple-800 text-base">ยังไม่มีรีวิวในหมวดหมู่นี้เลยค่ะ</p>
+            <p class="text-xs text-nori-muted mt-1">มาเป็นคนแรกที่เขียนรีวิวน่ารักๆ ให้ Yai Nori กันเถอะ!</p>
+            <button onclick="openWriteReviewModal()" class="mt-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white text-xs font-cute font-bold px-5 py-2 rounded-full shadow-md hover:opacity-95 transition">
+                + เขียนรีวิวแรก
+            </button>
+        </div>
+    </main>
+
+    <footer class="w-full bg-white/70 backdrop-blur-md border-t border-pink-100 py-5 px-4 text-center text-xs text-nori-muted">
+        <div class="max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p class="font-cute">© 2026 <span id="footer-shop-name" class="font-bold text-pink-600">Yai Nori</span> — Designed in Sweet Pastel Princess Style 🎀</p>
+            <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-purple-100 text-purple-700 text-[11px] font-medium">Demo Mode (LocalStorage)</span>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modal-write-review" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] max-w-md w-full p-6 shadow-2xl border-2 border-pink-200 relative animate-[fadeIn_0.2s_ease-out] max-h-[90vh] overflow-y-auto">
+            <button onclick="closeWriteReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 flex items-center justify-center transition">
+                <i class="ph-bold ph-x"></i>
+            </button>
+
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-pink-400 to-purple-400 text-white flex items-center justify-center mx-auto mb-2 shadow-md text-2xl">
+                    <i class="ph-fill ph-heart-straight"></i>
+                </div>
+                <h2 class="font-cute font-bold text-xl text-purple-900">ฝากรีวิวให้ Yai Nori 🎀</h2>
+                <p class="text-xs text-nori-muted">ทุกกำลังใจของคุณลูกค้ามีค่าสำหรับเรามากๆ เลยค่ะ</p>
+            </div>
+
+            <form id="form-write-review" onsubmit="submitCustomerReview(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-purple-900 mb-1">ชื่อของคุณลูกค้า <span class="text-pink-500">*</span></label>
+                        <input type="text" id="rev-name" required placeholder="เช่น คุณพลอยใส" 
+                               class="w-full rounded-2xl border border-pink-200 bg-pink-50/40 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-purple-900 mb-1">สินค้า/บริการที่รีวิว</label>
+                        <input type="text" id="rev-item" placeholder="เช่น เซ็ตโบว์ลูกคุณหนู" 
+                               class="w-full rounded-2xl border border-pink-200 bg-pink-50/40 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-purple-900 mb-1 text-center">ระดับความประทับใจ</label>
+                    <div class="flex items-center justify-center gap-2 bg-purple-50/60 py-2.5 rounded-2xl border border-purple-100" id="star-selector">
+                        <button type="button" onclick="setFormRating(1)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition"><i class="ph-fill ph-star"></i></button>
+                        <button type="button" onclick="setFormRating(2)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition"><i class="ph-fill ph-star"></i></button>
+                        <button type="button" onclick="setFormRating(3)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition"><i class="ph-fill ph-star"></i></button>
+                        <button type="button" onclick="setFormRating(4)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition"><i class="ph-fill ph-star"></i></button>
+                        <button type="button" onclick="setFormRating(5)" class="star-btn text-2xl text-amber-400 hover:scale-110 transition"><i class="ph-fill ph-star"></i></button>
+                    </div>
+                    <input type="hidden" id="rev-rating" value="5">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-purple-900 mb-1">ข้อความรีวิว <span class="text-pink-500">*</span></label>
+                    <textarea id="rev-comment" required rows="3" placeholder="เล่าความประทับใจให้เราฟังหน่อยนะคะ..."
+                              class="w-full rounded-2xl border border-pink-200 bg-pink-50/40 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-purple-900 mb-1">รูปรีวิวประกอบ (ลิงก์รูปภาพ หรือใช้รูป Demo)</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="rev-image" placeholder="วางลิงก์รูปภาพ https://... (ไม่บังคับ)" 
+                               class="flex-1 rounded-2xl border border-pink-200 bg-pink-50/40 px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-pink-400 focus:bg-white">
+                        <button type="button" onclick="fillDemoReviewImage()" class="shrink-0 bg-purple-100 hover:bg-purple-200 text-purple-800 text-xs font-medium px-3 py-2 rounded-2xl transition">
+                            + รูป Demo
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-3 rounded-full bg-gradient-to-r from-pink-500 via-pink-400 to-purple-500 text-white font-cute font-bold text-sm shadow-floating hover:opacity-95 transition cursor-pointer">
+                    ✨ ส่งรีวิวความประทับใจ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-thank-you" class="fixed inset-0 bg-purple-950/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-7 text-center shadow-2xl border-2 border-pink-200 relative animate-[fadeIn_0.2s_ease-out]">
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-pink-400 to-purple-400 text-white flex items-center justify-center mx-auto mb-3 shadow-lg text-3xl animate-bounce">
+                <i class="ph-fill ph-heart"></i>
+            </div>
+            <h3 id="thank-you-title" class="font-cute font-bold text-xl text-purple-950 mb-1">ขอบคุณสำหรับรีวิวนะคะ! 💖</h3>
+            <p id="thank-you-message" class="text-xs sm:text-sm text-nori-text mb-5 leading-relaxed">
+                รีวิวของคุณลูกค้ามีความหมายกับ Yai Nori มากๆ เลยค่ะ ขอให้มีความสุขในทุกๆ วันนะคะ 🌷✨
+            </p>
+            <button onclick="closeThankYouModal()" class="w-full py-2.5 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-cute font-bold text-sm shadow-md hover:opacity-95 transition cursor-pointer">
+                ตกลง / ปิดหน้าต่าง
+            </button>
+        </div>
+    </div>
+
+    <div id="modal-read-review" class="fixed inset-0 bg-purple-950/40 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-[2rem] max-w-md w-full p-6 shadow-2xl border-2 border-pink-200 relative">
+            <button onclick="closeReadReviewModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 flex items-center justify-center transition">
+                <i class="ph-bold ph-x"></i>
+            </button>
+            <div id="read-review-content"></div>
+        </div>
+    </div>
+
+    <div id="modal-admin" class="fixed inset-0 bg-purple-950/50 backdrop-blur-sm z-50 hidden items-center justify-center p-3 sm:p-6">
+        <div class="bg-nori-bg rounded-[2rem] max-w-3xl w-full max-h-[92vh] flex flex-col shadow-2xl border-2 border-purple-200 overflow-hidden">
+            <div class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-4 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <i class="ph-fill ph-magic-wand text-2xl"></i>
+                    <div>
+                        <h2 class="font-cute font-bold text-lg leading-tight">ระบบหลังบ้าน Yai Nori (Admin Demo)</h2>
+                        <p class="text-[11px] text-pink-100">ข้อมูลจำลองการบันทึกบนเบราว์เซอร์</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="bg-white border-b border-pink-100 px-6 pt-3 flex gap-4 shrink-0">
+                <button id="tab-btn-reviews" onclick="switchAdminTab('reviews')" class="pb-2.5 text-sm font-cute font-bold border-b-2 border-pink-500 text-pink-600 flex items-center gap-1.5">
+                    <i class="ph-fill ph-chats-circle"></i> จัดการรีวิวลูกค้า
+                </button>
+                <button id="tab-btn-settings" onclick="switchAdminTab('settings')" class="pb-2.5 text-sm font-cute font-bold border-b-2 border-transparent text-nori-muted hover:text-purple-800 flex items-center gap-1.5">
+                    <i class="ph-fill ph-storefront"></i> ตั้งค่าร้าน / ปุ่มรีวิว / ข้อความขอบคุณ
+                </button>
+            </div>
+
+            <div class="p-6 overflow-y-auto flex-grow space-y-5">
+                <div id="admin-tab-reviews" class="space-y-4">
+                    <div class="flex flex-wrap items-center justify-between gap-2 bg-purple-50 border border-purple-100 rounded-2xl p-3.5 text-xs text-purple-900">
+                        <span>💡 แอดมินสามารถ <b>ซ่อน/แสดงผล</b> รีวิวบนหน้าเว็บ หรือ <b>ลบรีวิว</b> ได้ทันที</span>
+                        <button onclick="resetDemoData()" class="text-pink-600 hover:underline font-medium flex items-center gap-1">
+                            <i class="ph-bold ph-arrow-counter-clockwise"></i> รีเซ็ตข้อมูลตัวอย่าง
+                        </button>
+                    </div>
+                    <div id="admin-reviews-list" class="space-y-2.5"></div>
+                </div>
+
+                <div id="admin-tab-settings" class="hidden space-y-4">
+                    <form id="form-admin-settings" onsubmit="saveShopSettings(event)" class="space-y-4">
+                        <div class="bg-white p-4 rounded-2xl border border-pink-100 space-y-3 shadow-sm">
+                            <h3 class="font-cute font-bold text-sm text-purple-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-sparkle text-pink-500"></i> ข้อมูลร้านค้า และ ข้อความวิ่ง
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">ชื่อร้าน (ใต้โลโก้)</label>
+                                    <input type="text" id="set-shop-name" required class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">คำโปรยสั้นๆ ใต้ชื่อร้าน</label>
+                                    <input type="text" id="set-shop-bio" required class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-medium text-purple-900 mb-1">ข้อความวิ่งด้านบนสุด (Marquee)</label>
+                                <input type="text" id="set-marquee" required class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-pink-100 space-y-3 shadow-sm">
+                            <h3 class="font-cute font-bold text-sm text-purple-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-image text-pink-500"></i> รูปโลโก้ / แบนเนอร์ / รูปปุ่มรีวิว (PNG)
+                            </h3>
+                            <div>
+                                <label class="block text-xs font-medium text-purple-900 mb-1">ลิงก์รูปแบนเนอร์ (Banner URL)</label>
+                                <input type="url" id="set-banner-url" required class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 pt-1">
+                                <div>
+                                    <label class="block text-[11px] font-medium text-purple-800 mb-1">ความสูงแบนเนอร์ (เช่น 220px)</label>
+                                    <input type="text" id="set-banner-height" placeholder="เช่น 220px หรือ 18rem" class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-medium text-purple-800 mb-1">ความกว้างแบนเนอร์ (เช่น 100%)</label>
+                                    <input type="text" id="set-banner-width" placeholder="เช่น 100%" class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                            </div>
+
+                            <div class="pt-2">
+                                <label class="block text-xs font-medium text-purple-900 mb-1">ลิงก์รูปโลโก้วงกลม (Logo URL)</label>
+                                <input type="url" id="set-logo-url" required class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                            </div>
+
+                            <div class="pt-2 border-t border-pink-100">
+                                <label class="block text-xs font-semibold text-pink-600 mb-1">
+                                    🎀 รูปปุ่มรีวิว PNG (โปร่งใสตามต้นฉบับ)
+                                </label>
+                                <div class="flex flex-col sm:flex-row gap-2 mb-2">
+                                    <input type="text" id="set-review-btn-url" placeholder="วางลิงก์รูป .png หรืออัปโหลดไฟล์ด้านขวา..." class="flex-1 rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                    <label class="shrink-0 bg-pink-100 hover:bg-pink-200 text-pink-800 text-xs font-medium px-3 py-2 rounded-xl transition cursor-pointer inline-flex items-center justify-center gap-1">
+                                        <i class="ph-bold ph-upload-simple"></i> เลือกไฟล์ PNG
+                                        <input type="file" id="set-review-btn-file" accept="image/png,image/webp,image/gif,image/jpeg" onchange="handleReviewBtnFileUpload(event)" class="hidden">
+                                    </label>
+                                    <button type="button" onclick="clearCustomReviewBtn()" class="shrink-0 bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs font-medium px-3 py-2 rounded-xl transition">
+                                        ใช้ปุ่มเดิม
+                                    </button>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 mb-2">
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-purple-800 mb-1">ขนาดความกว้างปุ่มรีวิว</label>
+                                        <input type="text" id="set-review-btn-w" placeholder="เช่น 80px หรือ 5rem" class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[11px] font-medium text-purple-800 mb-1">ขนาดความสูงปุ่มรีวิว</label>
+                                        <input type="text" id="set-review-btn-h" placeholder="เช่น 80px หรือ 5rem" class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-semibold text-purple-900 mb-1">ข้อความกำกับใต้ปุ่มรีวิว</label>
+                                    <input type="text" id="set-review-caption" placeholder="เช่น ✏️ ปุ่มรีวิว กดเขียนเลย!" class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-pink-100 space-y-3 shadow-sm">
+                            <h3 class="font-cute font-bold text-sm text-purple-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-heart text-pink-500"></i> ข้อความป๊อปอัพขอบคุณหลังส่งรีวิว
+                            </h3>
+                            <div class="space-y-2">
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">หัวข้อป๊อปอัพ (Title)</label>
+                                    <input type="text" id="set-thanks-title" required class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">ข้อความขอบคุณ (Message)</label>
+                                    <textarea id="set-thanks-msg" required rows="2" class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-2xl border border-pink-100 space-y-3 shadow-sm">
+                            <h3 class="font-cute font-bold text-sm text-purple-900 flex items-center gap-1.5">
+                                <i class="ph-fill ph-share-network text-pink-500"></i> ลิงก์ช่องทางการติดต่อ
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">LINE Official / ID Link</label>
+                                    <input type="text" id="set-line" placeholder="https://line.me/..." class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">Instagram Link</label>
+                                    <input type="text" id="set-ig" placeholder="https://instagram.com/..." class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-medium text-purple-900 mb-1">Facebook / เพจร้าน</label>
+                                    <input type="text" id="set-fb" placeholder="https://facebook.com/..." class="w-full rounded-xl border border-pink-200 px-3 py-2 text-xs">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-cute font-bold text-sm px-6 py-2.5 rounded-full shadow-md hover:opacity-95 transition cursor-pointer">
+                                💾 บันทึกการตั้งค่าร้าน (Demo)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY_SHOP = 'yainori_demo_shop_v2';
+        const STORAGE_KEY_REVIEWS = 'yainori_demo_reviews_v2';
+
+        const defaultShopSettings = {
+            shopName: 'Yai Nori',
+            shopBio: 'รวมรีวิวความประทับใจจากคุณลูกค้าที่น่ารัก ขอบคุณที่อุดหนุนนะคะ 🌷✨',
+            marquee: '🌸 ยินดีต้อนรับสู่ Yai Nori พื้นที่รวมรีวิวจากคุณลูกค้าที่น่ารักทุกท่าน! กดที่ "ปุ่มรีวิว" เพื่อแบ่งปันความประทับใจได้เลยนะคะ 🎀✨',
+            bannerUrl: 'https://i.postimg.cc/6QW0bm9v/mi-m-ch-x-37-20261018235415.png',
+            bannerWidth: '',
+            bannerHeight: '',
+            logoUrl: 'https://i.postimg.cc/6QW0bm9v/mi-m-ch-x-37-20261018235415.png',
+            reviewBtnUrl: '',
+            reviewBtnW: '',
+            reviewBtnH: '',
+            reviewCaption: '✏️ ปุ่มรีวิว กดเขียนเลย!',
+            thanksTitle: 'ขอบคุณสำหรับรีวิวนะคะ! 💖',
+            thanksMsg: 'รีวิวของคุณลูกค้ามีความหมายกับ Yai Nori มากๆ เลยค่ะ ขอให้มีความสุขในทุกๆ วันนะคะ 🌷✨',
+            lineUrl: 'https://line.me',
+            igUrl: 'https://instagram.com',
+            fbUrl: 'https://facebook.com'
+        };
+
+        const defaultReviews = [
+            {
+                id: 'rev-1',
+                name: 'คุณมิวสิค 🎀',
+                item: 'เซ็ตของขวัญ Yai Nori Special',
+                rating: 5,
+                comment: 'งานจริงน่ารักมากกก แพ็กเกจจิ้งใส่ใจทุกรายละเอียด เปิดกล่องมาหอมฟุ้งเลยค่ะ ประทับใจสุดๆ ไว้มาอุดหนุนอีกแน่นอนน้า 💕',
+                date: '20 ต.ค. 2026',
+                avatarColor: 'from-pink-300 to-purple-300',
+                imageUrl: 'https://placehold.co/600x400/FCE7F3/9D174D?text=Demo+Review+Photo+1',
+                visible: true
+            },
+            {
+                id: 'rev-2',
+                name: 'คุณแพนด้าพาสเทล 🌷',
+                item: 'คอลเลกชันสีชมพูม่วงพาสเทล',
+                rating: 5,
+                comment: 'แม่ค้าน่ารักพูดจาดีมาก ตอบไว ให้คำแนะนำละเอียดสุดๆ ของตรงปกไม่จกตา 100/10 ไปเลยค่า ✨',
+                date: '19 ต.ค. 2026',
+                avatarColor: 'from-purple-300 to-pink-300',
+                imageUrl: '',
+                visible: true
+            },
+            {
+                id: 'rev-3',
+                name: 'คุณลูกพีช 🍑',
+                item: 'เซ็ตมินิมอลลูกคุณหนู',
+                rating: 5,
+                comment: 'ได้รับของไวมากค่ะ ห่อกันกระแทกมาอย่างดี มีของแถมเล็กๆ น้อยๆ มาให้ด้วย น่ารักใจเจ็บมากกก 🥺💖',
+                date: '18 ต.ค. 2026',
+                avatarColor: 'from-pink-400 to-rose-300',
+                imageUrl: 'https://placehold.co/600x400/F3E8FF/6B21A8?text=Demo+Review+Photo+2',
+                visible: true
+            },
+            {
+                id: 'rev-4',
+                name: 'คุณเฌอแตม 👑',
+                item: 'สินค้าสั่งทำพิเศษ',
+                rating: 5,
+                comment: 'สั่งเป็นของขวัญให้เพื่อน เพื่อนชอบมากกก โทนสีละมุนตุ้นดูแพงแบบลูกคุณหนูสุดๆ ขอบคุณร้าน Yai Nori มากเลยนะคะ',
+                date: '16 ต.ค. 2026',
+                avatarColor: 'from-violet-300 to-purple-400',
+                imageUrl: '',
+                visible: true
+            },
+            {
+                id: 'rev-5',
+                name: 'คุณเบลล่า 🦋',
+                item: 'เซ็ตคู่หูพาสเทล',
+                rating: 4,
+                comment: 'ของน่ารักปุ๊กปิ๊กมากค่ะ สีหวานละมุนถูกใจสุดๆ ขนส่งอาจจะช้านิดนึงแต่ทางร้านช่วยตามให้ตลอดเลย น่ารักมากค่ะ',
+                date: '15 ต.ค. 2026',
+                avatarColor: 'from-fuchsia-300 to-pink-400',
+                imageUrl: '',
+                visible: true
+            },
+            {
+                id: 'rev-6',
+                name: 'คุณไอริน 🍓',
+                item: 'พรีเมียมบ็อกซ์เซ็ต',
+                rating: 5,
+                comment: 'กลับมาซ้ำรอบที่ 3 แล้วค่ะ มาตรฐานดีเหมือนเดิมไม่เปลี่ยนเลย ใครลังเลอยู่แนะนำเลยค่ะ ไม่ผิดหวังแน่นอน!',
+                date: '12 ต.ค. 2026',
+                avatarColor: 'from-pink-300 to-purple-400',
+                imageUrl: 'https://placehold.co/600x400/FCE7F3/831843?text=Demo+Review+Photo+3',
+                visible: true
+            },
+            {
+                id: 'rev-7',
+                name: 'คุณซินดี้ 🌸',
+                item: 'ไอเทมขายดีประจำเดือน',
+                rating: 5,
+                comment: 'ละมุนตั้งแต่หน้าเว็บยันตัวสินค้าเลยค่ะ ชอบความใส่ใจของร้าน Yai Nori ที่สุด เอาไปเลยห้าดาวเต็ม! ⭐',
+                date: '10 ต.ค. 2026',
+                avatarColor: 'from-purple-300 to-indigo-300',
+                imageUrl: '',
+                visible: true
+            }
+        ];
+
+        let shopState = {};
+        let reviewsState = [];
+
+        function loadState() {
+            try {
+                const savedShop = localStorage.getItem(STORAGE_KEY_SHOP);
+                const savedReviews = localStorage.getItem(STORAGE_KEY_REVIEWS);
+                shopState = savedShop ? JSON.parse(savedShop) : { ...defaultShopSettings };
+                reviewsState = savedReviews ? JSON.parse(savedReviews) : [...defaultReviews];
+            } catch (e) {
+                shopState = { ...defaultShopSettings };
+                reviewsState = [...defaultReviews];
+            }
+        }
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY_SHOP, JSON.stringify(shopState));
+                localStorage.setItem(STORAGE_KEY_REVIEWS, JSON.stringify(reviewsState));
+            } catch (e) {
+                console.warn('LocalStorage not available.');
+            }
+        }
+
+        function handleCustomReviewBtnError() {
+            const btnWriteReview = document.getElementById('btn-write-review');
+            const defaultBtnContent = document.getElementById('default-review-btn-content');
+            const customBtnImg = document.getElementById('custom-review-btn-img');
+
+            customBtnImg.classList.add('hidden');
+            defaultBtnContent.classList.remove('hidden');
+            btnWriteReview.style.width = '';
+            btnWriteReview.style.height = '';
+            customBtnImg.style.width = '';
+            customBtnImg.style.height = '';
+            btnWriteReview.className = 'btn-review-circle w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-pink-400 via-pink-500 to-purple-500 text-white p-1 shadow-floating hover:scale-105 active:scale-95 transition-all flex flex-col items-center justify-center border-4 border-white group cursor-pointer overflow-hidden shrink-0';
+        }
+
+        function renderShopInfo() {
+            document.getElementById('display-marquee').textContent = shopState.marquee;
+            document.getElementById('display-shop-name').textContent = shopState.shopName;
+            document.getElementById('footer-shop-name').textContent = shopState.shopName;
+            document.getElementById('display-shop-bio').textContent = shopState.shopBio;
+            
+            const bannerWrapper = document.getElementById('banner-wrapper');
+            const displayBanner = document.getElementById('display-banner');
+            displayBanner.src = shopState.bannerUrl;
+            
+            if (shopState.bannerWidth) {
+                bannerWrapper.style.width = shopState.bannerWidth;
+            } else {
+                bannerWrapper.style.width = '100%';
+            }
+            if (shopState.bannerHeight) {
+                bannerWrapper.style.height = shopState.bannerHeight;
+            } else {
+                bannerWrapper.style.height = '';
+            }
+
+            document.getElementById('display-logo').src = shopState.logoUrl;
+
+            const btnWriteReview = document.getElementById('btn-write-review');
+            const defaultBtnContent = document.getElementById('default-review-btn-content');
+            const customBtnImg = document.getElementById('custom-review-btn-img');
+            const customCaption = document.getElementById('custom-review-caption');
+
+            customCaption.textContent = shopState.reviewCaption || '✏️ ปุ่มรีวิว กดเขียนเลย!';
+
+            if (shopState.reviewBtnUrl && shopState.reviewBtnUrl.trim() !== '') {
+                defaultBtnContent.classList.add('hidden');
+                customBtnImg.classList.remove('hidden');
+                customBtnImg.src = shopState.reviewBtnUrl.trim();
+                
+                let customW = shopState.reviewBtnW && shopState.reviewBtnW.trim() !== '' ? shopState.reviewBtnW.trim() : '';
+                let customH = shopState.reviewBtnH && shopState.reviewBtnH.trim() !== '' ? shopState.reviewBtnH.trim() : '';
+
+                if (customW) {
+                    btnWriteReview.style.width = customW;
+                    customBtnImg.style.width = customW;
+                } else {
+                    btnWriteReview.style.width = '5rem';
+                    customBtnImg.style.width = '100%';
+                }
+                if (customH) {
+                    btnWriteReview.style.height = customH;
+                    customBtnImg.style.height = customH;
+                } else {
+                    btnWriteReview.style.height = '5rem';
+                    customBtnImg.style.height = '100%';
+                }
+
+                btnWriteReview.className = 'btn-review-circle bg-transparent shadow-none hover:scale-110 active:scale-95 transition-all flex items-center justify-center group cursor-pointer overflow-visible shrink-0 border-0 p-0';
+            } else {
+                customBtnImg.removeAttribute('src');
+                customBtnImg.classList.add('hidden');
+                defaultBtnContent.classList.remove('hidden');
+                btnWriteReview.style.width = '';
+                btnWriteReview.style.height = '';
+                customBtnImg.style.width = '';
+                customBtnImg.style.height = '';
+                btnWriteReview.className = 'btn-review-circle w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br from-pink-400 via-pink-500 to-purple-500 text-white p-1 shadow-floating hover:scale-105 active:scale-95 transition-all flex flex-col items-center justify-center border-4 border-white group cursor-pointer overflow-hidden shrink-0';
+            }
+
+            const contactsContainer = document.getElementById('display-contacts');
+            contactsContainer.innerHTML = '';
+            if (shopState.lineUrl) {
+                contactsContainer.innerHTML += `
+                    <a href="${shopState.lineUrl}" target="_blank" rel="noopener noreferrer"
+                       class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition">
+                        <i class="ph-fill ph-line-logo"></i> LINE
+                    </a>`;
+            }
+            if (shopState.igUrl) {
+                contactsContainer.innerHTML += `
+                    <a href="${shopState.igUrl}" target="_blank" rel="noopener noreferrer"
+                       class="bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition">
+                        <i class="ph-fill ph-instagram-logo"></i> IG
+                    </a>`;
+            }
+            if (shopState.fbUrl) {
+                contactsContainer.innerHTML += `
+                    <a href="${shopState.fbUrl}" target="_blank" rel="noopener noreferrer"
+                       class="bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1 transition">
+                        <i class="ph-fill ph-facebook-logo"></i> Page
+                    </a>`;
+            }
+        }
+
+        function renderReviews() {
+            const container = document.getElementById('reviews-zigzag-container');
+            const emptyState = document.getElementById('empty-reviews-state');
+            const filterVal = document.getElementById('filter-star').value;
+
+            const visibleReviews = reviewsState.filter(r => r.visible);
+            const total = visibleReviews.length;
+            const avg = total > 0 
+                ? (visibleReviews.reduce((acc, item) => acc + Number(item.rating), 0) / total).toFixed(1)
+                : '5.0';
+            document.getElementById('stat-avg-rating').textContent = avg;
+            document.getElementById('stat-total-reviews').textContent = total;
+
+            const filtered = visibleReviews.filter(r => {
+                if (filterVal === 'all') return true;
+                if (filterVal === '3') return r.rating <= 3;
+                return String(r.rating) === filterVal;
+            });
+
+            container.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            filtered.forEach((rev, idx) => {
+                const isRightSide = idx % 2 === 0;
+                const alignClass = isRightSide ? 'self-end sm:mr-2' : 'self-start sm:ml-2';
+                
+                const starsHtml = Array.from({ length: 5 }, (_, i) => 
+                    `<i class="ph-fill ph-star ${i < rev.rating ? 'text-amber-400' : 'text-pink-200'} text-xs"></i>`
+                ).join('');
+
+                const hasPhotoBadge = rev.imageUrl 
+                    ? `<span class="bg-pink-100 text-pink-700 text-[10px] px-2 py-0.5 rounded-full font-medium inline-flex items-center gap-0.5 shrink-0"><i class="ph-fill ph-image"></i> มีรูปรีวิว</span>` 
+                    : '';
+
+                const card = document.createElement('div');
+                card.className = `w-full sm:w-[74%] ${alignClass} princess-card rounded-full px-4 py-3 sm:px-6 sm:py-3.5 cursor-pointer flex items-center gap-3.5 group`;
+                card.onclick = () => openReadReviewModal(rev.id);
+
+                card.innerHTML = `
+                    <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr ${rev.avatarColor || 'from-pink-300 to-purple-300'} text-white flex items-center justify-center font-cute font-bold text-base sm:text-lg shrink-0 shadow-sm border-2 border-white">
+                        ${rev.name.replace('คุณ', '').trim().charAt(0)}
+                    </div>
+                    <div class="flex-1 min-w-0 pr-2">
+                        <div class="flex items-center justify-between gap-2">
+                            <h3 class="font-cute font-bold text-sm sm:text-base text-purple-950 truncate group-hover:text-pink-600 transition">
+                                ${rev.name}
+                            </h3>
+                            <div class="flex items-center gap-0.5 shrink-0">${starsHtml}</div>
+                        </div>
+                        <p class="text-xs sm:text-sm text-nori-text line-clamp-1 mt-0.5 font-normal">
+                            “${rev.comment}”
+                        </p>
+                        <div class="flex items-center gap-2 mt-1 text-[11px] text-nori-muted">
+                            <span class="truncate"><i class="ph-fill ph-tag text-pink-400"></i> ${rev.item || 'สินค้าในร้าน'}</span>
+                            <span>•</span>
+                            <span class="shrink-0">${rev.date}</span>
+                            ${hasPhotoBadge}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openWriteReviewModal() {
+            setFormRating(5);
+            document.getElementById('modal-write-review').classList.remove('hidden');
+            document.getElementById('modal-write-review').classList.add('flex');
+        }
+
+        function closeWriteReviewModal() {
+            document.getElementById('modal-write-review').classList.add('hidden');
+            document.getElementById('modal-write-review').classList.remove('flex');
+        }
+
+        function setFormRating(rating) {
+            document.getElementById('rev-rating').value = rating;
+            const buttons = document.querySelectorAll('#star-selector .star-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx < rating) {
+                    btn.classList.remove('text-gray-300');
+                    btn.classList.add('text-amber-400');
+                } else {
+                    btn.classList.remove('text-amber-400');
+                    btn.classList.add('text-gray-300');
+                }
+            });
+        }
+
+        function fillDemoReviewImage() {
+            document.getElementById('rev-image').value = 'https://placehold.co/600x400/FCE7F3/9D174D?text=Yai+Nori+Customer+Demo+Photo';
+        }
+
+        function submitCustomerReview(e) {
+            e.preventDefault();
+            const name = document.getElementById('rev-name').value.trim();
+            const item = document.getElementById('rev-item').value.trim() || 'สินค้าสุดคิ้วท์จาก Yai Nori';
+            const rating = Number(document.getElementById('rev-rating').value) || 5;
+            const comment = document.getElementById('rev-comment').value.trim();
+            const imageUrl = document.getElementById('rev-image').value.trim();
+
+            if (!name || !comment) return;
+
+            const today = new Date().toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+            const gradients = [
+                'from-pink-300 to-purple-300',
+                'from-purple-300 to-pink-400',
+                'from-rose-300 to-purple-300',
+                'from-fuchsia-300 to-pink-300'
+            ];
+
+            const newReview = {
+                id: 'rev-' + Date.now(),
+                name: name.startsWith('คุณ') ? name : `คุณ${name} 🎀`,
+                item,
+                rating,
+                comment,
+                date: today,
+                avatarColor: gradients[Math.floor(Math.random() * gradients.length)],
+                imageUrl,
+                visible: true
+            };
+
+            reviewsState.unshift(newReview);
+            saveState();
+            renderReviews();
+            document.getElementById('form-write-review').reset();
+            closeWriteReviewModal();
+            
+            // แสดงป๊อปอัพขอบคุณที่ตั้งค่าไว้จากหลังบ้าน
+            document.getElementById('thank-you-title').textContent = shopState.thanksTitle || 'ขอบคุณสำหรับรีวิวนะคะ! 💖';
+            document.getElementById('thank-you-message').textContent = shopState.thanksMsg || 'รีวิวของคุณลูกค้ามีความหมายกับ Yai Nori มากๆ เลยค่ะ ขอให้มีความสุขในทุกๆ วันนะคะ 🌷✨';
+            
+            const thankYouModal = document.getElementById('modal-thank-you');
+            thankYouModal.classList.remove('hidden');
+            thankYouModal.classList.add('flex');
+        }
+
+        function closeThankYouModal() {
+            const thankYouModal = document.getElementById('modal-thank-you');
+            thankYouModal.classList.add('hidden');
+            thankYouModal.classList.remove('flex');
+        }
+
+        function openReadReviewModal(reviewId) {
+            const rev = reviewsState.find(r => r.id === reviewId);
+            if (!rev) return;
+
+            const starsHtml = Array.from({ length: 5 }, (_, i) => 
+                `<i class="ph-fill ph-star ${i < rev.rating ? 'text-amber-400' : 'text-pink-200'} text-base"></i>`
+            ).join('');
+
+            const photoSection = rev.imageUrl ? `
+                <div class="mt-4 rounded-2xl overflow-hidden border border-pink-100 bg-pink-50">
+                    <img src="${rev.imageUrl}" alt="Review Photo" 
+                         onerror="this.src='https://placehold.co/600x400/FCE7F3/9D174D?text=Demo+Review+Image'"
+                         class="w-full h-48 object-cover">
+                </div>
+            ` : '';
+
+            document.getElementById('read-review-content').innerHTML = `
+                <div class="flex items-center gap-3.5 mb-4">
+                    <div class="w-14 h-14 rounded-full bg-gradient-to-tr ${rev.avatarColor} text-white flex items-center justify-center font-cute font-bold text-xl shadow-sm border-2 border-pink-100">
+                        ${rev.name.replace('คุณ', '').trim().charAt(0)}
+                    </div>
+                    <div>
+                        <h3 class="font-cute font-bold text-lg text-purple-950">${rev.name}</h3>
+                        <div class="flex items-center gap-1 mt-0.5">${starsHtml}</div>
+                        <span class="text-xs text-nori-muted block mt-0.5"><i class="ph-fill ph-tag text-pink-400"></i> ${rev.item} • ${rev.date}</span>
+                    </div>
+                </div>
+                <div class="bg-pink-50/60 border border-pink-100 rounded-2xl p-4 text-sm text-purple-950 leading-relaxed">
+                    “${rev.comment}”
+                </div>
+                ${photoSection}
+            `;
+
+            document.getElementById('modal-read-review').classList.remove('hidden');
+            document.getElementById('modal-read-review').classList.add('flex');
+        }
+
+        function closeReadReviewModal() {
+            document.getElementById('modal-read-review').classList.add('hidden');
+            document.getElementById('modal-read-review').classList.remove('flex');
+        }
+
+        function openAdminModal() {
+            populateAdminSettingsForm();
+            renderAdminReviewsList();
+            document.getElementById('modal-admin').classList.remove('hidden');
+            document.getElementById('modal-admin').classList.add('flex');
+        }
+
+        function closeAdminModal() {
+            document.getElementById('modal-admin').classList.add('hidden');
+            document.getElementById('modal-admin').classList.remove('flex');
+        }
+
+        function switchAdminTab(tab) {
+            const tabReviews = document.getElementById('admin-tab-reviews');
+            const tabSettings = document.getElementById('admin-tab-settings');
+            const btnReviews = document.getElementById('tab-btn-reviews');
+            const btnSettings = document.getElementById('tab-btn-settings');
+
+            if (tab === 'reviews') {
+                tabReviews.classList.remove('hidden');
+                tabSettings.classList.add('hidden');
+                btnReviews.className = 'pb-2.5 text-sm font-cute font-bold border-b-2 border-pink-500 text-pink-600 flex items-center gap-1.5';
+                btnSettings.className = 'pb-2.5 text-sm font-cute font-bold border-b-2 border-transparent text-nori-muted hover:text-purple-800 flex items-center gap-1.5';
+            } else {
+                tabReviews.classList.add('hidden');
+                tabSettings.classList.remove('hidden');
+                btnSettings.className = 'pb-2.5 text-sm font-cute font-bold border-b-2 border-pink-500 text-pink-600 flex items-center gap-1.5';
+                btnReviews.className = 'pb-2.5 text-sm font-cute font-bold border-b-2 border-transparent text-nori-muted hover:text-purple-800 flex items-center gap-1.5';
+            }
+        }
+
+        function renderAdminReviewsList() {
+            const list = document.getElementById('admin-reviews-list');
+            list.innerHTML = '';
+
+            reviewsState.forEach(rev => {
+                const row = document.createElement('div');
+                row.className = `bg-white rounded-2xl p-3.5 border ${rev.visible ? 'border-pink-100' : 'border-gray-200 opacity-60'} flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm`;
+                row.innerHTML = `
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-cute font-bold text-sm text-purple-950">${rev.name}</span>
+                            <span class="text-xs text-amber-500 font-semibold">★ ${rev.rating}</span>
+                            <span class="text-[11px] px-2 py-0.5 rounded-full ${rev.visible ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600'}">
+                                ${rev.visible ? 'แสดงบนหน้าเว็บ' : 'ถูกซ่อน'}
+                            </span>
+                        </div>
+                        <p class="text-xs text-nori-text truncate mt-1">“${rev.comment}”</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button onclick="toggleReviewVisibility('${rev.id}')" class="px-3 py-1.5 rounded-xl text-xs font-medium border border-purple-200 hover:bg-purple-50 text-purple-800 transition">
+                            ${rev.visible ? 'ซ่อนรีวิว' : 'แสดงรีวิว'}
+                        </button>
+                        <button onclick="deleteReview('${rev.id}')" class="px-3 py-1.5 rounded-xl text-xs font-medium bg-rose-50 hover:bg-rose-100 text-rose-600 transition flex items-center gap-1">
+                            <i class="ph-bold ph-trash"></i> ลบ
+                        </button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function toggleReviewVisibility(id) {
+            const item = reviewsState.find(r => r.id === id);
+            if (item) {
+                item.visible = !item.visible;
+                saveState();
+                renderReviews();
+                renderAdminReviewsList();
+            }
+        }
+
+        function deleteReview(id) {
+            reviewsState = reviewsState.filter(r => r.id !== id);
+            saveState();
+            renderReviews();
+            renderAdminReviewsList();
+        }
+
+        function populateAdminSettingsForm() {
+            document.getElementById('set-shop-name').value = shopState.shopName;
+            document.getElementById('set-shop-bio').value = shopState.shopBio;
+            document.getElementById('set-marquee').value = shopState.marquee;
+            document.getElementById('set-banner-url').value = shopState.bannerUrl;
+            document.getElementById('set-banner-width').value = shopState.bannerWidth || '';
+            document.getElementById('set-banner-height').value = shopState.bannerHeight || '';
+            document.getElementById('set-logo-url').value = shopState.logoUrl;
+            document.getElementById('set-review-btn-url').value = shopState.reviewBtnUrl || '';
+            document.getElementById('set-review-btn-w').value = shopState.reviewBtnW || '';
+            document.getElementById('set-review-btn-h').value = shopState.reviewBtnH || '';
+            document.getElementById('set-review-caption').value = shopState.reviewCaption || '✏️ ปุ่มรีวิว กดเขียนเลย!';
+            document.getElementById('set-thanks-title').value = shopState.thanksTitle || 'ขอบคุณสำหรับรีวิวนะคะ! 💖';
+            document.getElementById('set-thanks-msg').value = shopState.thanksMsg || 'รีวิวของคุณลูกค้ามีความหมายกับ Yai Nori มากๆ เลยค่ะ ขอให้มีความสุขในทุกๆ วันนะคะ 🌷✨';
+            document.getElementById('set-line').value = shopState.lineUrl;
+            document.getElementById('set-ig').value = shopState.igUrl;
+            document.getElementById('set-fb').value = shopState.fbUrl;
+        }
+
+        function clearCustomReviewBtn() {
+            document.getElementById('set-review-btn-url').value = '';
+            document.getElementById('set-review-btn-w').value = '';
+            document.getElementById('set-review-btn-h').value = '';
+            const fileInput = document.getElementById('set-review-btn-file');
+            if (fileInput) fileInput.value = '';
+        }
+
+        function saveShopSettings(e) {
+            e.preventDefault();
+            shopState.shopName = document.getElementById('set-shop-name').value.trim();
+            shopState.shopBio = document.getElementById('set-shop-bio').value.trim();
+            shopState.marquee = document.getElementById('set-marquee').value.trim();
+            shopState.bannerUrl = document.getElementById('set-banner-url').value.trim();
+            shopState.bannerWidth = document.getElementById('set-banner-width').value.trim();
+            shopState.bannerHeight = document.getElementById('set-banner-height').value.trim();
+            shopState.logoUrl = document.getElementById('set-logo-url').value.trim();
+            shopState.reviewBtnUrl = document.getElementById('set-review-btn-url').value.trim();
+            shopState.reviewBtnW = document.getElementById('set-review-btn-w').value.trim();
+            shopState.reviewBtnH = document.getElementById('set-review-btn-h').value.trim();
+            shopState.reviewCaption = document.getElementById('set-review-caption').value.trim();
+            shopState.thanksTitle = document.getElementById('set-thanks-title').value.trim();
+            shopState.thanksMsg = document.getElementById('set-thanks-msg').value.trim();
+            shopState.lineUrl = document.getElementById('set-line').value.trim();
+            shopState.igUrl = document.getElementById('set-ig').value.trim();
+            shopState.fbUrl = document.getElementById('set-fb').value.trim();
+
+            saveState();
+            renderShopInfo();
+            closeAdminModal();
+        }
+
+        function handleReviewBtnFileUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const maxDim = 256;
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const optimizedDataUrl = canvas.toDataURL('image/png');
+                    document.getElementById('set-review-btn-url').value = optimizedDataUrl;
+                };
+                img.onerror = function() {
+                    document.getElementById('set-review-btn-url').value = e.target.result;
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetDemoData() {
+            shopState = { ...defaultShopSettings };
+            reviewsState = [...defaultReviews];
+            saveState();
+            renderShopInfo();
+            renderReviews();
+            renderAdminReviewsList();
+            populateAdminSettingsForm();
+        }
+
+        window.onload = function() {
+            loadState();
+            renderShopInfo();
+            renderReviews();
+        };
+    </script>
+</body>
+</html>
